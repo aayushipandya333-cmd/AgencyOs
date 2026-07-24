@@ -40,14 +40,14 @@ export async function createTask(getToken, task) {
 
 
 export async function updateTask(getToken, taskId, task) {
-    return fetchWithAuth(`/api/tasks/${taskID}`, getToken,{
+    return fetchWithAuth(`/api/tasks/${taskId}`, getToken,{
         method: "PUT", 
         body : JSON.stringify(task)
     })
 } 
 
 export async function deleteTask(getToken, taskId) {
-    return fetchWithAuth(`/api/tasks/${taskID}`, getToken,{
+    return fetchWithAuth(`/api/tasks/${taskId}`, getToken,{
         method: "DELETE"
     })
 } 

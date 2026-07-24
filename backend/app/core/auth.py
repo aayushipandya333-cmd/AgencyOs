@@ -32,7 +32,7 @@ class AuthUser:
 
 def convert_to_httpx_request(fastapi_request: Request) -> httpx.Request:        #fastapi request object converted to httpx request object to use it directly with clerk model 
         return httpx.Request(
-            method = fastapi.request.method,
+            method = fastapi_request.method,
             url = str(fastapi_request.url),
             headers = dict(fastapi_request.headers)
         )
@@ -45,7 +45,7 @@ async def get_current_user(request: Request) -> AuthUser:
           AuthenticateRequestOptions(authorized_parties=[settings.FRONTEND_URL])
      )
 
-    if not request.state.is_signed_in:
+    if not request_state.is_signed_in:
           raise HTTPException(
                status_code = status.HTTP_401_UNAOTHORIZED, detail="Not authenticated"
           )
@@ -59,7 +59,7 @@ async def get_current_user(request: Request) -> AuthUser:
 
     if not user_id:
         raise HTTPException(
-                status_code = status.HTTP_401_UNAOTHORIZED, detail="Not authenticated"
+                status_code = status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
             )
 
     if not org_id:

@@ -10,8 +10,12 @@ from app.schemas.task import TaskCreate, TaskUpdate, TaskStatusUpdate,TaskRespon
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
 @router.get(path="", response_model=List[TaskResponse])
-def list_tasks(user: AuthUser = Depends(require_view), db: Session = Depends(get_db)):
-    tasks = db.query(Task).filter(Task.org_id == user.org.id).all()
+def list_tasks(
+    user: AuthUser = Depends(require_view),
+    db: Session = Depends(get_db)
+):
+    tasks = db.query(Task).filter(Task.org_id == user.org_id).all()
+    return tasks
 
 @router.post(path="", response_model=TaskResponse)
 def create_task(

@@ -35,4 +35,28 @@ function App() {
   </Routes>
 }
 
+
 export default App
+
+
+
+/*
+
+
+function App() {
+  return<Routes>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<HomePage />} />
+      <Route path={"sign-in/*"} element={<SigninPage />}/>
+      <Route path={"sign-up/*"} element={<SignupPage />}/>
+      <Route path={"pricing"} element={<PricingPage />}/>
+      <Route 
+        path={"dashboard"} 
+        element={
+          <DashboardPage />
+        }
+        />
+    </Route>
+  </Routes>
+}
+*/

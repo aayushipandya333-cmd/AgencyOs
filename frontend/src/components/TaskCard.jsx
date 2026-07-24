@@ -22,10 +22,12 @@ function TaskCard({task, onEdit, onDelete}) {
                         </button>
                 )}
 
-                {task.description && (
+                
+            </div>
+
+            {task.description && (
                     <p className={"task-card-description"}>{task.description}</p>
                 )}
-            </div>
     </div>
 }
 
