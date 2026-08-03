@@ -7,8 +7,8 @@ from app.api import tasks
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title = "Task Board API",
-    description = "B2B Task Board App",
+    title = "Agency OS API",
+    description = "B2B Agency OS",
     version="1.0.0"
 )
 
