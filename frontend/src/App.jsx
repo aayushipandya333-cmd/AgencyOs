@@ -6,6 +6,8 @@ import SigninPage from "./pages/SigninPage.jsx"
 import SignupPage from "./pages/SignupPage.jsx"
 import DashboardPage from "./pages/DashboardPage.jsx"
 import PricingPage from "./pages/PricingPage.jsx"
+import LeadPage from "./pages/LeadPage.jsx";
+
 
 function ProtectedRoute({children}) {
   return<>
@@ -28,6 +30,14 @@ function App() {
         element={
         <ProtectedRoute>
           <DashboardPage />
+        </ProtectedRoute>
+        }
+        />
+        <Route
+        path={"leads"}
+        element={
+        <ProtectedRoute>
+            <LeadPage />
         </ProtectedRoute>
         }
         />

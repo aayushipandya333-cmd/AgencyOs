@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.api import tasks
+from app.api import leads
+from app.models.task import Task
+from app.models.lead import Lead
 
 Base.metadata.create_all(bind=engine)
 
@@ -21,3 +24,4 @@ app.add_middleware(
 )
 
 app.include_router(tasks.router)
+app.include_router(leads.router)

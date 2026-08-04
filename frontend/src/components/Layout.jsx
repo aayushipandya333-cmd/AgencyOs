@@ -38,10 +38,17 @@ function Layout() {
                             }
                         }}
                     />
-                    {Organization && 
-                    <Link to={"/dashboard"} className={"nav-link"}>
-                            Dashboard
-                    </Link>}
+                    {Organization && (
+                         <>
+                             <Link to={"/dashboard"} className={"nav-link"}>
+                                      Dashboard
+                            </Link>
+
+                             <Link to={"/leads"} className={"nav-link"}>
+                                        Leads
+                              </Link>
+                         </>
+                    )}
 
                     <UserButton />
                 </SignedIn>

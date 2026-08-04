@@ -27,6 +27,11 @@ export async function fetchWithAuth(endpoint, getToken, options = {}) {
     return response.json()
 }
 
+
+
+
+// ---------- TASKS ----------
+
 export async function getTasks(getToken) {
     return fetchWithAuth("/api/tasks", getToken)
 } 
@@ -52,3 +57,32 @@ export async function deleteTask(getToken, taskId) {
     })
 } 
 
+
+
+
+
+// ---------- LEADS ----------
+
+export async function getLeads(getToken) {
+    return fetchWithAuth("/api/leads", getToken)
+}
+
+export async function createLead(getToken, lead) {
+    return fetchWithAuth("/api/leads", getToken, {
+        method: "POST",
+        body: JSON.stringify(lead)
+    })
+}
+
+export async function updateLead(getToken, leadId, lead) {
+    return fetchWithAuth(`/api/leads/${leadId}`, getToken, {
+        method: "PUT",
+        body: JSON.stringify(lead)
+    })
+}
+
+export async function deleteLead(getToken, leadId) {
+    return fetchWithAuth(`/api/leads/${leadId}`, getToken, {
+        method: "DELETE"
+    })
+}
