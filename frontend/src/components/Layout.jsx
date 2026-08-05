@@ -25,39 +25,38 @@ function Layout() {
                     </Link>
                     </SignedOut>
 
-                <SignedIn>
-                    <OrganizationSwitcher
-                        hidePersonal
-                        afterCreateOrganizationUrl={"dashboard"}
-                        afterSelectOrganizationUrl={"dashboard"}
-                        createOrganizationMode={"modal"}
-                        appearance={{
-                            elements: {
-                                userPreviewMainIdentifierText__personalWorkspace: {color: "white"},
-                                organizationPreviewMainIdentifier__organizationSwitcherTrigger: {color: "white"}
-                            }
-                        }}
-                    />
-                    {Organization && (
-                         <>
-                             <Link to={"/dashboard"} className={"nav-link"}>
-                                      Dashboard
-                            </Link>
+                    <SignedIn>
+                        <OrganizationSwitcher
+                            hidePersonal                                  //Personal Workspace is not shown in the dropdown
+                            afterCreateOrganizationUrl={"dashboard"}       //after creating and selecting organization, open dashboard of that organization
+                            afterSelectOrganizationUrl={"dashboard"}
+                            createOrganizationMode={"modal"}     //A modal is a popup window that appears on top of the current page, when you click on create organization     
+                            appearance={{                       //appearance prop lets you customize the UI of Clerk components.
+                                elements: {
+                                    organizationPreviewMainIdentifier__organizationSwitcherTrigger: {color: "white"},  //The name of selected organization appearing on navbar is by default black so making it white 
+                                    organizationSwitcherTriggerIcon: {color: "white"}                                 //The dropdown icon appearing on navbar beside selected organization name is by default black so making it white 
+                            }}}
+                        />
+                        {Organization && (
+                            <>
+                                <Link to={"/dashboard"} className={"nav-link"}>
+                                        Dashboard
+                                </Link>
 
-                             <Link to={"/leads"} className={"nav-link"}>
-                                        Leads
-                              </Link>
-                         </>
-                    )}
+                                <Link to={"/leads"} className={"nav-link"}>
+                                            Leads
+                                </Link>
+                            </>
+                        )}
 
-                    <UserButton />
-                </SignedIn>
+                        <UserButton />
+                    </SignedIn>
                 </div>
             </div>
         </div>
 
         <main>
-            <Outlet />
+            <Outlet />         {/*  Render the corresponding page (Home, Pricing, Dashboard, etc.) according to current URL. Navbar is fixed in all pages and the page to be rendered will be different */}
         </main>
 
 

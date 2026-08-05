@@ -1,11 +1,13 @@
 import {useState, useEffect} from "react"
+// useState ---> To hold values of the Form filled by user
+// useEffect ---> If task is being edited, then old values in the form will be filled by useEffect 
 
-function TaskForm({task, onSubmit, onCancel}) {
+function TaskForm({task, onSubmit, onCancel}) {                  //These detials are coming from KanbanBoard. handleSubmit() and handleCancel() are passed from kanban in onSubmit and onCancel
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
     const [status, setStatus] = useState('pending')
 
-    const isEditing = !!task
+    const isEditing = !!task                   // !! ----> If task hold some value (of task to be edited) then isEditing = true, else (task = null)  then isEditing = false
 
     useEffect(() => {
         if (task) {

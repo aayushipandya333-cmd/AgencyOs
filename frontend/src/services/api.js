@@ -1,4 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
+//File which acts as a bridge between frontend and backend
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"                         // To store base url of backend. Access the backend url either with .env file (If mentioned there) or use direct localhost link provided after ||
 
 export async function fetchWithAuth(endpoint, getToken, options = {}) {
     const token = await getToken()
