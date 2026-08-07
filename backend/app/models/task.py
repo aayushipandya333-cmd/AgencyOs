@@ -1,7 +1,7 @@
-import uuid
+import uuid                                           # UUID = Universally Unique Identifier
 from datetime import datetime
 from sqlalchemy import Column, String, Text, DateTime, Enum
-import enum
+import enum                                           # enum means limited fixed values (Tasks has only 3 values : Pending, started, completed)
 from app.core.database import Base
 
 class TaskStatus(str, enum.Enum):
