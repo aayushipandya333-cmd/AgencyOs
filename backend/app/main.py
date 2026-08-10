@@ -7,6 +7,7 @@ from app.core.config import settings
 from app.core.database import engine, Base
 from app.api import tasks
 from app.api import leads
+from app.api import ai_leads
 from app.models.task import Task
 from app.models.lead import Lead
 
@@ -27,4 +28,5 @@ app.add_middleware(
 )
 
 app.include_router(tasks.router)                            # register all endpoints of api -> tasks.py into application
-app.include_router(leads.router)                            # register all endpoints of api -> leads.py into application
+app.include_router(leads.router)                            # register all endpoints of api -> leads.py into application\
+app.include_router(ai_leads.router)

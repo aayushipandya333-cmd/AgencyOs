@@ -12,8 +12,10 @@ class Config:
             DATABASE_URL: str = os.getenv("DATABASE_URL", "")
             FRONTEND_URL: str = os.getenv("FRONTEND_URL", "")
 
+            GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+
             FREE_TIER_MEMBERSHIP_LIMIT: int = 3
-            PRO_TIER_MEMBERSHIP_LIMIT = 0;  #unlimited
+            PRO_TIER_MEMBERSHIP_LIMIT = 0  #unlimited
             
 settings = Config()
             
