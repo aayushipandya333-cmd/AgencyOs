@@ -93,3 +93,14 @@ export async function deleteLead(getToken, leadId) {
         method: "DELETE"
     })
 }
+
+
+
+// ---------- AI LEADS ----------
+
+export async function findAILeads(getToken, requirements) {
+    return fetchWithAuth("/api/ai_leads/find", getToken, {
+        method: "POST",
+        body: JSON.stringify(requirements)
+    })
+}
