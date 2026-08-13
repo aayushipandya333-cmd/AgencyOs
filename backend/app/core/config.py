@@ -16,7 +16,11 @@ class Config:
 
             FREE_TIER_MEMBERSHIP_LIMIT: int = 3
             PRO_TIER_MEMBERSHIP_LIMIT = 0  #unlimited
-            
+
+            GOOGLE_CLIENT_ID: str = os.getenv("GOOGLE_CLIENT_ID", "")
+            GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET", "")
+            GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI", "")
+                        
 settings = Config()
             
     

@@ -38,6 +38,19 @@ Important rules:
 - Do not invent companies or information.
 - If a value is unknown, return null.
 - Return exactly the requested number of leads if possible.
+
+IMPORTANT OUTPUT FORMAT RULES:
+
+- website must be a plain URL only.
+  Example: https://example.com
+  Do NOT return Markdown links.
+
+- email must be a plain email address only.
+  Example: info@example.com
+  Do NOT return Markdown links or mailto links.
+
+- Do not use Markdown formatting anywhere in the values.
+- Return valid JSON according to the provided schema.
 """
 
     response = client.models.generate_content(

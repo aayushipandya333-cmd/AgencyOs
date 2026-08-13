@@ -8,8 +8,13 @@ from app.core.database import engine, Base
 from app.api import tasks
 from app.api import leads
 from app.api import ai_leads
+from app.api import ai_email
+from app.api import send_email
 from app.models.task import Task
 from app.models.lead import Lead
+from app.models.gmail_connection import GmailConnection
+from app.models.gmail_oauth_state import GmailOAuthState
+
 
 Base.metadata.create_all(bind=engine)                       # instructs SQLAlchemy to create all tables defined by models that inherit from Base. It uses the engine to connect to the configured database and creates only the tables that do not already exist.
 
@@ -30,3 +35,5 @@ app.add_middleware(
 app.include_router(tasks.router)                            # register all endpoints of api -> tasks.py into application
 app.include_router(leads.router)                            # register all endpoints of api -> leads.py into application\
 app.include_router(ai_leads.router)
+app.include_router(ai_email.router)
+app.include_router(send_email.router)

@@ -104,3 +104,40 @@ export async function findAILeads(getToken, requirements) {
         body: JSON.stringify(requirements)
     })
 }
+
+
+// ---------- AI EMAIL ----------
+
+export async function generateAIEmail(getToken, emailData) {
+    return fetchWithAuth("/api/ai_email/generate", getToken, {
+        method: "POST",
+        body: JSON.stringify(emailData)
+    })
+}
+
+// ---------- SEND EMAIL ----------
+
+export async function sendEmail(getToken, emailData) {
+    return fetchWithAuth("/api/email/send", getToken, {
+        method: "POST",
+        body: JSON.stringify(emailData)
+    })
+}
+
+
+// ---------- GMAIL ----------
+
+export async function getGmailStatus(getToken) {
+    return fetchWithAuth(
+        "/api/email/gmail/status",
+        getToken
+    )
+}
+
+
+export async function connectGmail(getToken) {
+    return fetchWithAuth(
+        "/api/email/gmail/connect",
+        getToken
+    )
+}

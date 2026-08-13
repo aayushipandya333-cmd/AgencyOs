@@ -4,7 +4,9 @@ import { useAuth } from "@clerk/clerk-react"
 import {
     getLeads,
     createLead,
-    findAILeads
+    findAILeads,
+    getGmailStatus,
+    connectGmail
 } from "../services/api"
 
 import LeadTable from "../components/LeadTable"
@@ -20,6 +22,10 @@ function LeadsPage() {
     const [leads, setLeads] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+
+    const [gmailConnected, setGmailConnected] = useState(false)
+    const [gmailEmail, setGmailEmail] = useState(null)
+    const [gmailLoading, setGmailLoading] = useState(false)
 
     // Manual Lead Form
     const [showForm, setShowForm] = useState(false)
@@ -57,11 +63,37 @@ function LeadsPage() {
     }, [getToken])
 
 
-    useEffect(() => {
-        loadLeads()
-    }, [loadLeads])
+// ---------------- LOAD GMAIL STATUS ----------------
+
+const loadGmailStatus = useCallback(async () => {
+
+    try {
+
+        const data = await getGmailStatus(getToken)
+
+        setGmailConnected(data.connected)
+        setGmailEmail(data.gmail_email)
+
+    } catch (err) {
+
+        console.error(
+            "Failed to load Gmail status:",
+            err
+        )
+
+    }
+
+}, [getToken])
 
 
+useEffect(() => {
+    loadLeads()
+}, [loadLeads])
+
+
+useEffect(() => {
+    loadGmailStatus()
+}, [loadGmailStatus])
     // ---------------- MANUAL LEAD ----------------
 
     async function handleSubmit(leadData) {
@@ -116,9 +148,7 @@ function LeadsPage() {
                 getToken,
                 requirements
             )
-            console.log("AI RESPONSE:", response)
-            console.log("AI LEADS:", response.leads)
-
+            
 
             setAILeads(response.leads || [])
 
@@ -184,6 +214,29 @@ function LeadsPage() {
 }
 
 
+    async function handleConnectGmail() {
+
+    try {
+
+        setGmailLoading(true)
+
+        const data = await connectGmail(getToken)
+
+        window.location.href = data.authorization_url
+
+    } catch (err) {
+
+        console.error(
+            "Gmail connection error:",
+            err
+        )
+
+        alert(err.message)
+
+        setGmailLoading(false)
+    }
+}
+
     return (
         <div className="dashboard-container">
 
@@ -223,6 +276,54 @@ function LeadsPage() {
             ) : (
 
                 <>
+
+                    <div className="card gmail-card">
+
+    <h3>Gmail Integration</h3>
+
+    {gmailConnected ? (
+
+        <div>
+
+            <p>
+                Gmail connected:
+                <strong> {gmailEmail}</strong>
+            </p>
+
+            <button
+                className="btn btn-outline"
+                disabled
+            >
+                Gmail Connected
+            </button>
+
+        </div>
+
+    ) : (
+
+        <div>
+
+            <p>
+                Connect your organization's Gmail account
+                to send emails to your leads.
+            </p>
+
+            <button
+                className="btn btn-primary"
+                onClick={handleConnectGmail}
+                disabled={gmailLoading}
+            >
+                {gmailLoading
+                    ? "Connecting..."
+                    : "Connect Gmail"}
+            </button>
+
+        </div>
+
+    )}
+
+</div>
+
                     <LeadTable leads={leads} />
 
                     {showForm && (
@@ -254,6 +355,8 @@ function LeadsPage() {
         </div>
     )
 }
+
+
 
 
 export default LeadsPage
