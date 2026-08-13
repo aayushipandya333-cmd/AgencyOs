@@ -178,7 +178,7 @@ useEffect(() => {
             website: AILead.website || null,
             email: AILead.email || null,
             industry: AILead.industry || null,
-            status: "New",
+            status: "new",
             notes: `Location: ${AILead.location || "Unknown"}
             Reason: ${AILead.reason || "Not provided"}
             AI Lead Score: ${AILead.lead_score ?? "N/A"}`

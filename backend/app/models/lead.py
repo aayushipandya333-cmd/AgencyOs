@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime
+
 from sqlalchemy import Column, String, Text, DateTime
+
 from app.core.database import Base
 
 
@@ -13,21 +15,36 @@ class Lead(Base):
         default=lambda: str(uuid.uuid4())
     )
 
-    company_name = Column(String(255), nullable=False)
+    company_name = Column(
+        String(255),
+        nullable=False
+    )
 
-    website = Column(String(255), nullable=True)
+    website = Column(
+        String(255),
+        nullable=True
+    )
 
-    email = Column(String(255), nullable=True)
+    email = Column(
+        String(255),
+        nullable=True
+    )
 
-    industry = Column(String(255), nullable=True)
+    industry = Column(
+        String(255),
+        nullable=True
+    )
 
     status = Column(
         String(50),
         nullable=False,
-        default="New"
+        default="new"
     )
 
-    notes = Column(Text, nullable=True)
+    notes = Column(
+        Text,
+        nullable=True
+    )
 
     org_id = Column(
         String,

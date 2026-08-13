@@ -1,32 +1,100 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
+LeadStatus = Literal[
+    "new",
+    "contacted",
+    "qualified",
+    "closed"
+]
 
 class LeadCreate(BaseModel):
-    company_name: str
-    website: Optional[str] = None
-    email: Optional[str] = None
-    industry: Optional[str] = None
-    status: str = "New"
-    notes: Optional[str] = None
+    company_name: str = Field(
+        ...,
+        min_length=1,
+        max_length=255
+    )
+
+    website: Optional[str] = Field(
+        default=None,
+        max_length=255
+    )
+
+    email: Optional[EmailStr] = None
+
+    industry: Optional[str] = Field(
+        default=None,
+        max_length=255
+    )
+
+    status: LeadStatus = "new"
+
+    notes: Optional[str] = Field(
+        default=None,
+        max_length=5000
+    )
+
+    @field_validator("company_name")
+    @classmethod
+    def validate_company_name(cls, value: str) -> str:
+        value = value.strip()
+
+        if not value:
+            raise ValueError("Company name cannot be empty or whitespace")
+
+        return value
+
+
 
 
 class LeadUpdate(BaseModel):
-    company_name: Optional[str] = None
-    website: Optional[str] = None
-    email: Optional[str] = None
-    industry: Optional[str] = None
-    status: Optional[str] = None
-    notes: Optional[str] = None
+    company_name: Optional[str] = Field(
+        default=None,
+        min_length=1,
+        max_length=255
+    )
+
+    website: Optional[str] = Field(
+        default=None,
+        max_length=255
+    )
+
+    email: Optional[EmailStr] = None
+
+    industry: Optional[str] = Field(
+        default=None,
+        max_length=255
+    )
+
+    status: Optional[LeadStatus] = None
+
+    notes: Optional[str] = Field(
+        default=None,
+        max_length=5000
+    )
+
+    @field_validator("company_name")
+    @classmethod
+    def validate_company_name(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+
+        value = value.strip()
+
+        if not value:
+            raise ValueError("Company name cannot be empty or whitespace")
+
+        return value
+
 
 
 class LeadResponse(BaseModel):
     id: str
     company_name: str
     website: Optional[str]
-    email: Optional[str]
+    email: Optional[EmailStr]
     industry: Optional[str]
     status: str
     notes: Optional[str]
@@ -34,6 +102,7 @@ class LeadResponse(BaseModel):
     created_by: str
     created_at: datetime
     updated_at: datetime
+
 
     class Config:
         from_attributes = True
