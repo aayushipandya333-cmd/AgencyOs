@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 from typing import List
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.core.database import get_db
 from app.core.auth import (
@@ -14,6 +17,7 @@ from app.core.auth import (
 from app.models.lead import Lead
 from app.schemas.lead import LeadCreate, LeadUpdate, LeadResponse
 
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(
     prefix="/api/leads",
@@ -34,7 +38,9 @@ def list_leads(
 
 
 @router.post("", response_model=LeadResponse)
+@limiter.limit("20/minute")
 def create_lead(
+    request: Request,
     lead_data: LeadCreate,
     user: AuthUser = Depends(require_create),
     db: Session = Depends(get_db)
@@ -78,8 +84,10 @@ def get_lead(
 
 
 @router.put("/{lead_id}", response_model=LeadResponse)
+@limiter.limit("30/minute")
 def update_lead(
     lead_id: str,
+    request: Request,
     lead_data: LeadUpdate,
     user: AuthUser = Depends(require_edit),
     db: Session = Depends(get_db)
@@ -120,8 +128,10 @@ def update_lead(
 
 
 @router.delete("/{lead_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("20/minute")
 def delete_lead(
     lead_id: str,
+    request: Request,
     user: AuthUser = Depends(require_delete),
     db: Session = Depends(get_db)
 ):

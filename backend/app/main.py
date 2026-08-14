@@ -3,6 +3,11 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware              # A middleware runs before your request reaches your API and before the response goes back to the client. CORS - Cross-Origin Resource Sharing. a browser security feature that controls whether a frontend running on one origin (domain/port/protocol) can access a backend running on another origin.
+
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
 from app.core.config import settings
 from app.core.database import engine, Base
 from app.api import tasks
@@ -22,6 +27,16 @@ app = FastAPI(
     title = "Agency OS API",
     description = "B2B Agency OS",
     version="1.0.0"
+)
+
+
+limiter = Limiter(key_func=get_remote_address)                       # to find ip address of the request so that limiter can count seperately for individual ip address
+
+app.state.limiter = limiter
+
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler
 )
 
 app.add_middleware(

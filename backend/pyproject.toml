@@ -12,6 +12,10 @@ dependencies = [
     "pyjwt>=2.13.0",
     "python-dotenv>=1.2.2",
     "sqlalchemy>=2.0.51",
+    "slowapi>=0.1.9",
     "svix>=1.98.0",
     "uvicorn>=0.51.0",
+    "email-validator>=2.3.0",
+    "google-auth-oauthlib>=1.4.0",
+    "google-api-python-client>=2.198.0",
 ]

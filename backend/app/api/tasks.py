@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
@@ -9,6 +13,8 @@ from app.schemas.task import TaskCreate, TaskUpdate, TaskStatusUpdate,TaskRespon
 
 router = APIRouter(prefix="/api/tasks", tags=["tasks"])
 
+limiter = Limiter(key_func=get_remote_address)
+
 @router.get(path="", response_model=List[TaskResponse])
 def list_tasks(
     user: AuthUser = Depends(require_view),
@@ -18,7 +24,9 @@ def list_tasks(
     return tasks
 
 @router.post(path="", response_model=TaskResponse)
+@limiter.limit("20/minute")
 def create_task(
+    request: Request,
     task_data: TaskCreate, 
     user: AuthUser = Depends(require_create), 
     db: Session = Depends(get_db)
@@ -56,8 +64,10 @@ def get_task(
 
 
 @router.put(path="/{task_id}", response_model=TaskResponse)
+@limiter.limit("30/minute")
 def update_task(
     task_id: str,
+    request: Request,
     task_data: TaskUpdate,
     user: AuthUser = Depends(require_edit),
     db: Session = Depends(get_db)
@@ -86,8 +96,10 @@ def update_task(
 
 
 @router.delete(path="/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("20/minute")
 def delete_task(
     task_id: str,
+    request: Request,
     user: AuthUser = Depends(require_delete),
     db: Session = Depends(get_db)
 ):

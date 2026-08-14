@@ -1,6 +1,9 @@
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import RedirectResponse
+
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
 from app.core.auth import AuthUser, get_current_user
 from app.schemas.send_email import SendEmailRequest
@@ -14,6 +17,8 @@ from app.services.send_email import (
     get_gmail_connection,
     send_gmail_email
 )
+
+limiter = Limiter(key_func=get_remote_address)
 
 router = APIRouter(
     prefix="/api/email",
@@ -74,8 +79,10 @@ def gmail_status(
 
 
 @router.post("/send")
+@limiter.limit("10/minute")
 def send_email(
-    request: SendEmailRequest,
+    request: Request,
+    email_request: SendEmailRequest,
     current_user: AuthUser = Depends(get_current_user)
 ):
     """
@@ -93,9 +100,9 @@ def send_email(
 
         result = send_gmail_email(
             org_id=current_user.org_id,
-            recipient_email=request.recipient_email,
-            subject=request.subject,
-            body=request.body
+            recipient_email=email_request.recipient_email,
+            subject=email_request.subject,
+            body=email_request.body
         )
 
         return result
