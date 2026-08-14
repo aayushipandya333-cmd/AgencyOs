@@ -3,7 +3,6 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware              # A middleware runs before your request reaches your API and before the response goes back to the client. CORS - Cross-Origin Resource Sharing. a browser security feature that controls whether a frontend running on one origin (domain/port/protocol) can access a backend running on another origin.
-from starlette.middleware.base import BaseHTTPMiddleware        # BaseHTTPMiddleware creates a layer that can check/process HTTP requests before they reach the endpoint and responses before they go back to the client.
 
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -11,6 +10,9 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.config import settings
 from app.core.database import engine, Base
+from app.core.request_size import RequestSizeLimitMiddleware
+from app.core.security_headers import SecurityHeadersMiddleware
+
 from app.api import tasks
 from app.api import leads
 from app.api import ai_leads
@@ -30,20 +32,8 @@ app = FastAPI(
     version="1.0.0"
 )
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):              # Creates a custom middleware class for adding security headers.
-    async def dispatch(self, request, call_next):                 # Handles each request and controls what happens before/after the endpoint.
-        response = await call_next(request)                       # Sends the request to the endpoint and gets its response.
 
-        response.headers["X-Content-Type-Options"] = "nosniff"    # Stops the browser from guessing the file/content type.
-        response.headers["X-Frame-Options"] = "DENY"              # Prevents your website from being loaded inside an iframe of any other website.
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"        # Controls how much URL information is shared when leaving your site. "https://agencyos.com/dashboard/client/123" ---> not shared. "https://agencyos.com/" ---> shared
-        response.headers["Permissions-Policy"] = (                                     # Blocks the website from using the camera, microphone, and location.
-            "camera=(), microphone=(), geolocation=()"
-        )
 
-        return response
-
-    
 
 limiter = Limiter(key_func=get_remote_address)                       # to find ip address of the request so that limiter can count seperately for individual ip address
 
@@ -62,6 +52,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestSizeLimitMiddleware)
 
 app.include_router(tasks.router)                            # register all endpoints of api -> tasks.py into application
 app.include_router(leads.router)                            # register all endpoints of api -> leads.py into application\
