@@ -238,25 +238,38 @@ useEffect(() => {
 }
 
     return (
-        <div className="dashboard-container">
+        <div className="min-h-screen bg-slate-950 px-6 py-8">
 
-            <div className="dashboard-header">
-
-                <h1>Lead Finder</h1>
+             {/* ================= HEADER ================= */}
+            <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
                 <div>
+                    <p className="text-sm font-medium text-indigo-400">
+                        Prospecting
+                    </p>
+
+                    <h1 className="mt-1 text-3xl font-bold tracking-tight text-white">
+                        Lead Finder
+                    </h1>
+
+                    <p className="mt-2 text-sm text-slate-400">
+                        Discover, manage and qualify potential clients.
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
 
                     <button
-                        className="btn btn-primary"
+                        className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500"
                         onClick={() => setShowAIForm(true)}
-                    >
+                         >
                         ✨ Find Leads with AI
                     </button>
 
                     <button
-                        className="btn btn-primary"
+                        className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-800"
                         onClick={handleAddLead}
-                    >
+                         >
                         + Add Lead
                     </button>
 
@@ -264,68 +277,91 @@ useEffect(() => {
 
             </div>
 
-
+             {/* ================= LOADING ================= */}
             {loading ? (
 
-                <p>Loading Leads...</p>
+                <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center">
+                    <p className="text-sm text-slate-400">
+                        Loading leads...
+                    </p>
+                </div>
 
             ) : error ? (
 
-                <p>{error}</p>
+                /* ================= ERROR ================= */
+
+                <div className="rounded-xl border border-red-900/50 bg-red-950/30 p-6">
+                    <p className="font-semibold text-red-400">
+                        Error loading leads
+                    </p>
+
+                    <p className="mt-1 text-sm text-red-300/80">
+                        {error}
+                    </p>
+                </div>
 
             ) : (
 
                 <>
 
-                    <div className="card gmail-card">
+                 {/* ================= GMAIL ================= */}
 
-    <h3>Gmail Integration</h3>
 
-    {gmailConnected ? (
+                <div className="mb-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
 
-        <div>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
-            <p>
-                Gmail connected:
-                <strong> {gmailEmail}</strong>
-            </p>
+                        <div>
+                            <p className="text-sm font-semibold text-white">
+                                Gmail Integration
+                            </p>
 
-            <button
-                className="btn btn-outline"
-                disabled
-            >
-                Gmail Connected
-            </button>
+                            <p className="mt-1 text-sm text-slate-400">
+                                Connect Gmail to send outreach emails to your leads.
+                            </p>
+                        </div>
 
-        </div>
+                {gmailConnected ? (
 
-    ) : (
+                    <div>
+                        <p className="text-sm text-slate-300">
+                            Gmail connected:
+                            <strong className="ml-1 text-white">
+                                {gmailEmail}
+                            </strong>
+                        </p>
 
-        <div>
+                        <button
+                            className="mt-3 rounded-lg border border-emerald-800 bg-emerald-950/40 px-4 py-2 text-sm font-medium text-emerald-400"
+                            disabled
+                        >
+                            Gmail Connected
+                        </button>
+                    </div>
 
-            <p>
-                Connect your organization's Gmail account
-                to send emails to your leads.
-            </p>
+                ) : (
 
-            <button
-                className="btn btn-primary"
-                onClick={handleConnectGmail}
-                disabled={gmailLoading}
-            >
-                {gmailLoading
-                    ? "Connecting..."
-                    : "Connect Gmail"}
-            </button>
+                    <div>
+                        <button
+                            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={handleConnectGmail}
+                            disabled={gmailLoading}
+                        >
+                            {gmailLoading
+                                ? "Connecting..."
+                                : "Connect Gmail"}
+                        </button>
+                    </div>
 
-        </div>
-
-    )}
-
-</div>
-
-                    <LeadTable leads={leads} />
-
+                )}
+                </div>
+            </div>
+                     {/* ================= LEADS ================= */}
+                    <LeadTable
+                        leads={leads}
+                        setLeads={setLeads}
+                    />
+                     {/* ================= MANUAL LEAD FORM ================= */}
                     {showForm && (
                         <LeadForm
                             lead={editingLead}
@@ -334,6 +370,7 @@ useEffect(() => {
                         />
                     )}
 
+                      {/* ================= AI LEAD FORM ================= */}
                     {showAIForm && (
                         <AILeadForm
                             onSubmit={handleAIFind}
@@ -342,6 +379,7 @@ useEffect(() => {
                         />
                     )}
 
+                     {/* ================= AI RESULTS ================= */}
                     {AILeads.length > 0 && (
                     <AILeadResults
                         leads={AILeads}
@@ -354,9 +392,8 @@ useEffect(() => {
 
         </div>
     )
+
+
 }
-
-
-
 
 export default LeadsPage

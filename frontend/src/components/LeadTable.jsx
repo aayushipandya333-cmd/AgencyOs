@@ -1,28 +1,104 @@
 import { useState } from "react"
 import { useAuth } from "@clerk/clerk-react"
 
-import {  generateAIEmail, sendEmail } from "../services/api"
+import {
+    generateAIEmail,
+    sendEmail,
+    updateLead,
+    deleteLead
+} from "../services/api"
 
 
-function LeadTable({ leads }) {
+function LeadTable({ leads, setLeads }) {
 
     const { getToken } = useAuth()
 
     const [emailLoading, setEmailLoading] = useState(null)
     const [generatedEmail, setGeneratedEmail] = useState(null)
     const [sendLoading, setSendLoading] = useState(false)
-
+    const [deleteLoading, setDeleteLoading] = useState(null)
 
     if (leads.length === 0) {
         return (
-            <div className="card">
-                <h3>No Leads Found</h3>
-                <p>Create your first lead.</p>
+            <div className="rounded-xl border border-slate-800 bg-slate-900 p-8 text-center">
+
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 text-xl">
+                    👥
+                </div>
+
+                <h3 className="mt-4 text-lg font-semibold text-white">
+                    No Leads Found
+                </h3>
+
+                <p className="mt-2 text-sm text-slate-400">
+                    Add a lead manually or use AI Lead Finder to discover potential clients.
+                </p>
+
             </div>
         )
     }
 
+    async function handleStatusChange(lead, newStatus) {
 
+    try {
+
+        const updatedLead = await updateLead(
+            getToken,
+            lead.id,
+            {
+                status: newStatus
+            }
+        )
+
+        console.log("Lead status updated:", updatedLead)
+
+    } catch (err) {
+
+        console.error("Update Lead Status Error:", err)
+
+        alert(err.message)
+
+    }
+    }
+
+    async function handleDeleteLead(lead) {
+
+    const confirmed = window.confirm(
+        `Are you sure you want to delete ${lead.company_name}?`
+    )
+
+    if (!confirmed) {
+        return
+    }
+
+    try {
+
+        setDeleteLoading(lead.id)
+
+        await deleteLead(
+            getToken,
+            lead.id
+        )
+
+        // Remove deleted lead from the current table
+        setLeads(prev =>
+            prev.filter(item => item.id !== lead.id)
+        )
+
+        alert(`${lead.company_name} deleted successfully`)
+
+    } catch (err) {
+
+        console.error("Delete Lead Error:", err)
+
+        alert(err.message)
+
+    } finally {
+
+        setDeleteLoading(null)
+
+    }
+}
     async function handleGenerateEmail(lead) {
 
         try {
@@ -97,104 +173,342 @@ function LeadTable({ leads }) {
     }
 }
 
-
     return (
         <>
-            <table className="lead-table">
+            {/* ================= LEAD TABLE ================= */}
 
-                <thead>
-                    <tr>
-                        <th>Company</th>
-                        <th>Website</th>
-                        <th>Email</th>
-                        <th>Industry</th>
-                        <th>Status</th>
-                        <th>AI Email</th>
-                    </tr>
-                </thead>
+            <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
 
-                <tbody>
+                <div className="overflow-x-auto">
 
-                    {leads.map((lead) => (
+                    <table className="w-full min-w-[900px] text-left">
 
-                        <tr key={lead.id}>
+                        <thead className="border-b border-slate-800 bg-slate-900/80">
 
-                            <td>{lead.company_name}</td>
+                            <tr>
 
-                            <td>{lead.website || "N/A"}</td>
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Company
+                                </th>
 
-                            <td>{lead.email || "N/A"}</td>
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Website
+                                </th>
 
-                            <td>{lead.industry || "N/A"}</td>
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Email
+                                </th>
 
-                            <td>{lead.status}</td>
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Industry
+                                </th>
 
-                            <td>
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Status
+                                </th>
 
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={() => handleGenerateEmail(lead)}
-                                    disabled={emailLoading === lead.id}
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    AI Email
+                                </th>
+
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Actions
+                                </th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody className="divide-y divide-slate-800">
+
+                            {leads.map((lead) => (
+
+                                <tr
+                                    key={lead.id}
+                                    className="transition hover:bg-slate-800/40"
                                 >
-                                    {emailLoading === lead.id
-                                        ? "Generating..."
-                                        : "Generate Email"}
-                                </button>
 
-                            </td>
+                                    {/* Company */}
 
-                        </tr>
+                                    <td className="px-5 py-4">
 
-                    ))}
+                                        <p className="font-medium text-white">
+                                            {lead.company_name}
+                                        </p>
 
-                </tbody>
-
-            </table>
+                                    </td>
 
 
-            {generatedEmail && (
+                                    {/* Website */}
 
-                <div className="card">
+                                    <td className="px-5 py-4">
 
-                    <h3>AI Generated Email</h3>
+                                        {lead.website ? (
 
-                    <div className="form-group">
-                        <label>Subject</label>
+                                            <a
+                                                href={lead.website}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="max-w-[180px] truncate text-sm text-indigo-400 hover:text-indigo-300"
+                                            >
+                                                {lead.website}
+                                            </a>
 
-                        <input
-                            className="form-input"
-                            value={generatedEmail.subject}
-                            readOnly
-                        />
+                                        ) : (
+
+                                            <span className="text-sm text-slate-500">
+                                                N/A
+                                            </span>
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* Email */}
+
+                                    <td className="px-5 py-4">
+
+                                        {lead.email ? (
+
+                                            <span className="text-sm text-slate-300">
+                                                {lead.email}
+                                            </span>
+
+                                        ) : (
+
+                                            <span className="text-sm text-slate-500">
+                                                N/A
+                                            </span>
+
+                                        )}
+
+                                    </td>
+
+
+                                    {/* Industry */}
+
+                                    <td className="px-5 py-4">
+
+                                        <span className="text-sm text-slate-300">
+                                            {lead.industry || "N/A"}
+                                        </span>
+
+                                    </td>
+
+
+                                    {/* Status */}
+
+                                    <td className="px-5 py-4">
+
+                                        <select
+                                            value={lead.status || "new"}
+                                            onChange={async (event) => {
+
+                                                const newStatus = event.target.value
+
+                                                try {
+
+                                                    const updatedLead = await updateLead(
+                                                        getToken,
+                                                        lead.id,
+                                                        {
+                                                            status: newStatus
+                                                        }
+                                                    )
+
+                                                    setLeads(prev =>
+                                                        prev.map(item =>
+                                                            item.id === lead.id
+                                                                ? updatedLead
+                                                                : item
+                                                        )
+                                                    )
+                                                    alert(`Lead status changed to ${updatedLead.status}`)
+
+                                                } catch (err) {
+
+                                                    console.error("Update Lead Status Error:", err)
+
+                                                    alert(err.message)
+
+                                                }
+
+                                            }}
+                                            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs font-medium text-slate-200 outline-none transition focus:border-indigo-500"
+                                        >
+
+                                            <option value="new">
+                                                New
+                                            </option>
+
+                                            <option value="contacted">
+                                                Contacted
+                                            </option>
+
+                                            <option value="qualified">
+                                                Qualified
+                                            </option>
+
+                                            <option value="closed">
+                                                Closed
+                                            </option>
+
+                                        </select>
+
+                                    </td>
+
+
+                                    {/* AI Email */}
+
+                                    <td className="px-5 py-4">
+
+                                        <button
+                                            className="whitespace-nowrap rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                                            onClick={() => handleGenerateEmail(lead)}
+                                            disabled={emailLoading === lead.id}
+                                        >
+                                            {emailLoading === lead.id
+                                                ? "Generating..."
+                                                : "Generate Email"}
+                                        </button>
+
+                                    </td>
+
+                                    <td className="px-5 py-4">
+                                        <button
+                                            className="rounded-lg border border-red-900/60 bg-red-950/30 px-3 py-2 text-xs font-semibold text-red-400 transition hover:bg-red-950/60 disabled:cursor-not-allowed disabled:opacity-50"
+                                            onClick={() => handleDeleteLead(lead)}
+                                            disabled={deleteLoading === lead.id}
+                                        >
+                                            {deleteLoading === lead.id
+                                                ? "Deleting..."
+                                                : "Delete"}
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            ))}
+
+                        </tbody>
+
+                    </table>
+                    </div>
                     </div>
 
 
-                    <div className="form-group">
-                        <label>Email Body</label>
+
+            {/* ================= AI GENERATED EMAIL ================= */}
+
+            {generatedEmail && (
+
+                <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
+
+                    <div className="mb-6 flex items-start justify-between">
+
+                        <div>
+
+                            <p className="text-sm font-medium text-indigo-400">
+                                AI Outreach
+                            </p>
+
+                            <h3 className="mt-1 text-xl font-semibold text-white">
+                                AI Generated Email
+                            </h3>
+
+                            <p className="mt-1 text-sm text-slate-400">
+                                Email prepared for {generatedEmail.company_name}
+                            </p>
+
+                        </div>
+
+                        <button
+                            className="text-slate-500 transition hover:text-slate-300"
+                            onClick={() => setGeneratedEmail(null)}
+                            aria-label="Close email preview"
+                        >
+                            ✕
+                        </button>
+
+                    </div>
+
+
+                    {/* Recipient */}
+
+                    <div className="mb-4">
+
+                        <label className="mb-2 block text-sm font-medium text-slate-300">
+                            Recipient
+                        </label>
+
+                        <input
+                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-300 outline-none"
+                            value={generatedEmail.recipient_email || "No email available"}
+                            readOnly
+                        />
+
+                    </div>
+
+
+                    {/* Subject */}
+
+                    <div className="mb-4">
+
+                        <label className="mb-2 block text-sm font-medium text-slate-300">
+                            Subject
+                        </label>
+
+                        <input
+                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none"
+                            value={generatedEmail.subject}
+                            readOnly
+                        />
+
+                    </div>
+
+
+                    {/* Body */}
+
+                    <div className="mb-6">
+
+                        <label className="mb-2 block text-sm font-medium text-slate-300">
+                            Email Body
+                        </label>
 
                         <textarea
-                            className="form-textarea"
+                            className="w-full resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-sm leading-6 text-slate-300 outline-none"
                             value={generatedEmail.body}
                             readOnly
                             rows="10"
                         />
+
                     </div>
 
 
-                    <button
-                        className="btn btn-primary"
-                        onClick={handleSendEmail}
-                        disabled={sendLoading}
-                    >
-                        {sendLoading ? "Sending..." : "Send Email"}
-                    </button>
+                    {/* Actions */}
 
-                    <button
-                        className="btn btn-outline"
-                        onClick={() => setGeneratedEmail(null)}
-                    >
-                        Close
-                    </button>
+                    <div className="flex flex-wrap gap-3">
+
+                        <button
+                            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                            onClick={handleSendEmail}
+                            disabled={sendLoading}
+                        >
+                            {sendLoading
+                                ? "Sending..."
+                                : "Send Email"}
+                        </button>
+
+                        <button
+                            className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:border-slate-600 hover:bg-slate-800"
+                            onClick={() => setGeneratedEmail(null)}
+                        >
+                            Close
+                        </button>
+
+                    </div>
 
                 </div>
 
@@ -203,6 +517,5 @@ function LeadTable({ leads }) {
         </>
     )
 }
-
 
 export default LeadTable
