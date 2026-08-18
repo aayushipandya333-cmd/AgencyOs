@@ -1,21 +1,19 @@
 import { useState } from "react"
 import { useAuth } from "@clerk/clerk-react"
 
+import { useNavigate } from "react-router-dom"
+
 import {
-    generateAIEmail,
-    sendEmail,
     updateLead,
     deleteLead
 } from "../services/api"
 
 
 function LeadTable({ leads, setLeads }) {
-
+    
+    const navigate = useNavigate()
     const { getToken } = useAuth()
 
-    const [emailLoading, setEmailLoading] = useState(null)
-    const [generatedEmail, setGeneratedEmail] = useState(null)
-    const [sendLoading, setSendLoading] = useState(false)
     const [deleteLoading, setDeleteLoading] = useState(null)
 
     if (leads.length === 0) {
@@ -99,80 +97,7 @@ function LeadTable({ leads, setLeads }) {
 
     }
 }
-    async function handleGenerateEmail(lead) {
-
-        try {
-
-            setEmailLoading(lead.id)
-
-            const response = await generateAIEmail(
-                getToken,
-                {
-                    company_name: lead.company_name,
-                    industry: lead.industry,
-                    website: lead.website,
-                    service: "Web Development",
-                    recipient_name: null,
-                    additional_context: lead.notes
-                }
-            )
-
-            setGeneratedEmail({
-                leadId: lead.id,
-                recipient_email: lead.email,
-                company_name: lead.company_name,
-                ...response.email
-            })
-
-        } catch (err) {
-
-            console.error(err)
-            alert(err.message)
-
-        } finally {
-
-            setEmailLoading(null)
-
-        }
-    }
-
-
-    async function handleSendEmail() {
-
-    if (!generatedEmail) {
-        return
-    }
-
-    try {
-
-        setSendLoading(true)
-
-        const response = await sendEmail(
-            getToken,
-            {
-                recipient_email: generatedEmail.recipient_email,
-                subject: generatedEmail.subject,
-                body: generatedEmail.body
-            }
-        )
-
-        alert(
-            `Email sent successfully from ${response.gmail_email}`
-        )
-
-    } catch (err) {
-
-        console.error("Send Email Error:", err)
-
-        alert(err.message)
-
-    } finally {
-
-        setSendLoading(false)
-
-    }
-}
-
+    
     return (
         <>
             {/* ================= LEAD TABLE ================= */}
@@ -364,13 +289,16 @@ function LeadTable({ leads, setLeads }) {
                                     <td className="px-5 py-4">
 
                                         <button
-                                            className="whitespace-nowrap rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-                                            onClick={() => handleGenerateEmail(lead)}
-                                            disabled={emailLoading === lead.id}
+                                            className="whitespace-nowrap rounded-lg bg-indigo-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-indigo-500"
+                                            onClick={() =>
+                                                navigate("/emails", {
+                                                    state: {
+                                                        selectedLead: lead
+                                                    }
+                                                })
+                                            }
                                         >
-                                            {emailLoading === lead.id
-                                                ? "Generating..."
-                                                : "Generate Email"}
+                                            Generate Email
                                         </button>
 
                                     </td>
@@ -398,121 +326,6 @@ function LeadTable({ leads, setLeads }) {
                     </div>
                     </div>
 
-
-
-            {/* ================= AI GENERATED EMAIL ================= */}
-
-            {generatedEmail && (
-
-                <div className="mt-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
-
-                    <div className="mb-6 flex items-start justify-between">
-
-                        <div>
-
-                            <p className="text-sm font-medium text-indigo-400">
-                                AI Outreach
-                            </p>
-
-                            <h3 className="mt-1 text-xl font-semibold text-white">
-                                AI Generated Email
-                            </h3>
-
-                            <p className="mt-1 text-sm text-slate-400">
-                                Email prepared for {generatedEmail.company_name}
-                            </p>
-
-                        </div>
-
-                        <button
-                            className="text-slate-500 transition hover:text-slate-300"
-                            onClick={() => setGeneratedEmail(null)}
-                            aria-label="Close email preview"
-                        >
-                            ✕
-                        </button>
-
-                    </div>
-
-
-                    {/* Recipient */}
-
-                    <div className="mb-4">
-
-                        <label className="mb-2 block text-sm font-medium text-slate-300">
-                            Recipient
-                        </label>
-
-                        <input
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-slate-300 outline-none"
-                            value={generatedEmail.recipient_email || "No email available"}
-                            readOnly
-                        />
-
-                    </div>
-
-
-                    {/* Subject */}
-
-                    <div className="mb-4">
-
-                        <label className="mb-2 block text-sm font-medium text-slate-300">
-                            Subject
-                        </label>
-
-                        <input
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white outline-none"
-                            value={generatedEmail.subject}
-                            readOnly
-                        />
-
-                    </div>
-
-
-                    {/* Body */}
-
-                    <div className="mb-6">
-
-                        <label className="mb-2 block text-sm font-medium text-slate-300">
-                            Email Body
-                        </label>
-
-                        <textarea
-                            className="w-full resize-y rounded-lg border border-slate-700 bg-slate-950 px-3 py-3 text-sm leading-6 text-slate-300 outline-none"
-                            value={generatedEmail.body}
-                            readOnly
-                            rows="10"
-                        />
-
-                    </div>
-
-
-                    {/* Actions */}
-
-                    <div className="flex flex-wrap gap-3">
-
-                        <button
-                            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-                            onClick={handleSendEmail}
-                            disabled={sendLoading}
-                        >
-                            {sendLoading
-                                ? "Sending..."
-                                : "Send Email"}
-                        </button>
-
-                        <button
-                            className="rounded-lg border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:border-slate-600 hover:bg-slate-800"
-                            onClick={() => setGeneratedEmail(null)}
-                        >
-                            Close
-                        </button>
-
-                    </div>
-
-                </div>
-
-            )}
 
         </>
     )

@@ -8,6 +8,7 @@ import DashboardPage from "./pages/DashboardPage.jsx"
 import PricingPage from "./pages/PricingPage.jsx"
 import LeadPage from "./pages/LeadPage.jsx";
 import TaskPage from "./pages/TaskPage.jsx";
+import EmailPage from "./pages/EmailPage.jsx"
 
 
 function ProtectedRoute({children}) {
@@ -49,6 +50,14 @@ function App() {
                 <TaskPage />
             </ProtectedRoute>
         }
+        />
+        <Route
+            path={"emails"}
+            element={
+                <ProtectedRoute>
+                    <EmailPage />
+                </ProtectedRoute>
+            }
         />
     </Route>
   </Routes>

@@ -5,8 +5,6 @@ import {
     getLeads,
     createLead,
     findAILeads,
-    getGmailStatus,
-    connectGmail
 } from "../services/api"
 
 import LeadTable from "../components/LeadTable"
@@ -23,9 +21,6 @@ function LeadsPage() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
-    const [gmailConnected, setGmailConnected] = useState(false)
-    const [gmailEmail, setGmailEmail] = useState(null)
-    const [gmailLoading, setGmailLoading] = useState(false)
 
     // Manual Lead Form
     const [showForm, setShowForm] = useState(false)
@@ -63,27 +58,6 @@ function LeadsPage() {
     }, [getToken])
 
 
-// ---------------- LOAD GMAIL STATUS ----------------
-
-const loadGmailStatus = useCallback(async () => {
-
-    try {
-
-        const data = await getGmailStatus(getToken)
-
-        setGmailConnected(data.connected)
-        setGmailEmail(data.gmail_email)
-
-    } catch (err) {
-
-        console.error(
-            "Failed to load Gmail status:",
-            err
-        )
-
-    }
-
-}, [getToken])
 
 
 useEffect(() => {
@@ -91,9 +65,6 @@ useEffect(() => {
 }, [loadLeads])
 
 
-useEffect(() => {
-    loadGmailStatus()
-}, [loadGmailStatus])
     // ---------------- MANUAL LEAD ----------------
 
     async function handleSubmit(leadData) {
@@ -214,28 +185,7 @@ useEffect(() => {
 }
 
 
-    async function handleConnectGmail() {
-
-    try {
-
-        setGmailLoading(true)
-
-        const data = await connectGmail(getToken)
-
-        window.location.href = data.authorization_url
-
-    } catch (err) {
-
-        console.error(
-            "Gmail connection error:",
-            err
-        )
-
-        alert(err.message)
-
-        setGmailLoading(false)
-    }
-}
+   
 
     return (
         <div className="min-h-screen bg-slate-950 px-6 py-8">
@@ -304,58 +254,7 @@ useEffect(() => {
 
                 <>
 
-                 {/* ================= GMAIL ================= */}
-
-
-                <div className="mb-6 rounded-xl border border-slate-800 bg-slate-900 p-6">
-
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-
-                        <div>
-                            <p className="text-sm font-semibold text-white">
-                                Gmail Integration
-                            </p>
-
-                            <p className="mt-1 text-sm text-slate-400">
-                                Connect Gmail to send outreach emails to your leads.
-                            </p>
-                        </div>
-
-                {gmailConnected ? (
-
-                    <div>
-                        <p className="text-sm text-slate-300">
-                            Gmail connected:
-                            <strong className="ml-1 text-white">
-                                {gmailEmail}
-                            </strong>
-                        </p>
-
-                        <button
-                            className="mt-3 rounded-lg border border-emerald-800 bg-emerald-950/40 px-4 py-2 text-sm font-medium text-emerald-400"
-                            disabled
-                        >
-                            Gmail Connected
-                        </button>
-                    </div>
-
-                ) : (
-
-                    <div>
-                        <button
-                            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-                            onClick={handleConnectGmail}
-                            disabled={gmailLoading}
-                        >
-                            {gmailLoading
-                                ? "Connecting..."
-                                : "Connect Gmail"}
-                        </button>
-                    </div>
-
-                )}
-                </div>
-            </div>
+                 
                      {/* ================= LEADS ================= */}
                     <LeadTable
                         leads={leads}
