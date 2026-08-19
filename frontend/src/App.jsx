@@ -9,6 +9,7 @@ import PricingPage from "./pages/PricingPage.jsx"
 import LeadPage from "./pages/LeadPage.jsx";
 import TaskPage from "./pages/TaskPage.jsx";
 import EmailPage from "./pages/EmailPage.jsx"
+import FollowUpPage from "./pages/FollowUpPage.jsx"
 
 
 function ProtectedRoute({children}) {
@@ -41,6 +42,14 @@ function App() {
         <ProtectedRoute>
             <LeadPage />
         </ProtectedRoute>
+        }
+        />
+        <Route
+        path={"follow-ups"}
+        element={
+            <ProtectedRoute>
+                <FollowUpPage />
+            </ProtectedRoute>
         }
         />
         <Route

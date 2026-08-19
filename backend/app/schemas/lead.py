@@ -70,6 +70,10 @@ class LeadUpdate(BaseModel):
 
     status: Optional[LeadStatus] = None
 
+    last_contacted_at: Optional[datetime] = None
+
+    next_follow_up_at: Optional[datetime] = None
+
     notes: Optional[str] = Field(
         default=None,
         max_length=5000
@@ -97,6 +101,8 @@ class LeadResponse(BaseModel):
     email: Optional[EmailStr]
     industry: Optional[str]
     status: str
+    last_contacted_at: Optional[datetime]
+    next_follow_up_at: Optional[datetime]
     notes: Optional[str]
     org_id: str
     created_by: str

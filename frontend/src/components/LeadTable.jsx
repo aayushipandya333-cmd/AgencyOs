@@ -133,6 +133,10 @@ function LeadTable({ leads, setLeads }) {
                                 </th>
 
                                 <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                                    Follow-Up
+                                </th>
+
+                                <th className="px-5 py-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
                                     AI Email
                                 </th>
 
@@ -280,6 +284,61 @@ function LeadTable({ leads, setLeads }) {
                                             </option>
 
                                         </select>
+
+                                    </td>
+
+
+                                    {/* Follow-Up */}
+
+                                    <td className="px-5 py-4">
+
+                                        <input
+                                            type="datetime-local"
+                                            value={
+                                                lead.next_follow_up_at
+                                                    ? new Date(lead.next_follow_up_at)
+                                                        .toISOString()
+                                                        .slice(0, 16)
+                                                    : ""
+                                            }
+
+                                            onChange={async (event) => {
+
+                                                const nextFollowUp = event.target.value
+
+                                                try {
+
+                                                    const updatedLead = await updateLead(
+                                                        getToken,
+                                                        lead.id,
+                                                        {
+                                                            next_follow_up_at: nextFollowUp || null
+                                                        }
+                                                    )
+
+                                                    setLeads(prev =>
+                                                        prev.map(item =>
+                                                            item.id === lead.id
+                                                                ? updatedLead
+                                                                : item
+                                                        )
+                                                    )
+
+                                                } catch (err) {
+
+                                                    console.error(
+                                                        "Update Follow-Up Error:",
+                                                        err
+                                                    )
+
+                                                    alert(err.message)
+
+                                                }
+
+                                            }}
+
+                                            className="rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-200 outline-none transition focus:border-indigo-500 [color-scheme:dark]"
+                                        />
 
                                     </td>
 

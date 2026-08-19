@@ -118,6 +118,12 @@ def update_lead(
     if lead_data.status is not None:
         lead.status = lead_data.status
 
+    if lead_data.last_contacted_at is not None:
+        lead.last_contacted_at = lead_data.last_contacted_at
+
+    if lead_data.next_follow_up_at is not None:
+        lead.next_follow_up_at = lead_data.next_follow_up_at
+
     if lead_data.notes is not None:
         lead.notes = lead_data.notes
 

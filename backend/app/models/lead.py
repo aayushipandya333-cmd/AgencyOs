@@ -41,6 +41,16 @@ class Lead(Base):
         default="new"
     )
 
+    last_contacted_at = Column(
+        DateTime,
+        nullable=True
+    )
+
+    next_follow_up_at = Column(
+        DateTime,
+        nullable=True
+    )
+
     notes = Column(
         Text,
         nullable=True
